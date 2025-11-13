@@ -17,6 +17,7 @@ export default function RetailerOrders() {
     const fetchOrders = async () => {
       try {
         const data = await api.retailer.getOrders(token!);
+        console.log(data);
         if (data.error) {
           toast.error(data.error);
         } else {
@@ -83,9 +84,12 @@ export default function RetailerOrders() {
                 ) : (
                   orders.map((order) => (
                     <TableRow key={order.id}>
-                      <TableCell className="font-medium">#{order.id || 'N/A'}</TableCell>
-                      <TableCell>{order.wholesalerName || order.wholesaler?.name || 'N/A'}</TableCell>
-                      <TableCell>{order.itemCount || 0} items</TableCell>
+                      <TableCell className="font-medium">#{order._id || 'N/A'}</TableCell>
+                      <TableCell>{order.wholesaler?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        {order.items?.reduce((sum, item) => sum + item.quantity, 0)} items
+                      </TableCell>
+
                       <TableCell className="font-semibold">₹{order.total || 0}</TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(order.status)}>

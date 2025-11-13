@@ -18,6 +18,7 @@ export default function WholesalerOrders() {
   const fetchOrders = async () => {
     try {
       const data = await api.wholesaler.getOrders(token!);
+      console.log(data);
       if (data.error) {
         toast.error(data.error);
       } else {
@@ -84,6 +85,7 @@ export default function WholesalerOrders() {
                 <TableRow>
                   <TableHead>Order ID</TableHead>
                   <TableHead>Customer</TableHead>
+                  <TableHead>Items</TableHead> {/* changed header */}
                   <TableHead>Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
@@ -93,7 +95,7 @@ export default function WholesalerOrders() {
               <TableBody>
                 {orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       No orders found
                     </TableCell>
                   </TableRow>
@@ -102,6 +104,30 @@ export default function WholesalerOrders() {
                     <TableRow key={order._id}>
                       <TableCell className="font-medium">#{order._id}</TableCell>
                       <TableCell>{order.retailer?.name || order.customer?.name || 'N/A'}</TableCell>
+
+                      <TableCell>
+                        <div className="flex flex-col gap-1 max-w-xs">
+                          {order.items && order.items.length > 0 ? (
+                            order.items.map((it: any) => (
+                              <div key={it._id} className="flex items-baseline justify-between">
+                                <div className="min-w-0">
+                                  <div className="text-sm font-medium truncate">{it.product?.name || 'Product'}</div>
+                                  <div className="text-xs text-muted-foreground">
+                                    MOQ: {it.product?.moq ?? '-'} • Stock: {it.product?.stock ?? '-'}
+                                  </div>
+                                </div>
+                                <div className="ml-3 text-sm whitespace-nowrap">
+                                  <span className="font-semibold">{it.quantity}</span>
+                                  <span className="text-muted-foreground text-xs"> × ₹{it.price}</span>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-sm text-muted-foreground">—</div>
+                          )}
+                        </div>
+                      </TableCell>
+
                       <TableCell>₹{order.total}</TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(order.status)}>
